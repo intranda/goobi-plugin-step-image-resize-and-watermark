@@ -1,6 +1,6 @@
 # Goobi workflow Plugin: goobi-plugin-step-sudan-export-preparation
 
-Creates a PDF file of all pages in a process and includes the mets structure
+Scales images down to a specific size and adds watermarks.
 
 ## Plugin details
 
