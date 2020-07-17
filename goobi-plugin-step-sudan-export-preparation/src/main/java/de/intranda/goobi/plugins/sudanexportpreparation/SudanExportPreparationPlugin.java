@@ -142,16 +142,31 @@ public class SudanExportPreparationPlugin implements IStepPluginVersion2 {
     private boolean resizeImages() {
         String gmPath = pluginConfig.getString("gmPath", "/usr/bin/gm");
 
-        String sourceDir = projectAndStepConfig.getString("sourceDir", "cropped");
-        String destDir = projectAndStepConfig.getString("destDir", "media");
+        org.goobi.beans.Process process = step.getProzess();
+
+        String sourceDir = null;
+        String destDir = null;
+        try {
+            sourceDir = process.getConfiguredImageFolder(projectAndStepConfig.getString("sourceDir", "cropped"));
+            destDir = process.getConfiguredImageFolder(projectAndStepConfig.getString("destDir", "media"));
+        } catch (IOException | InterruptedException | SwapException | DAOException e2) {
+            writeErrorToProcessLog("Error reading configured input and output folders");
+            log.error(e2);
+            return false;
+        }
 
         int size = projectAndStepConfig.getInt("resizeTo", 1500);
         String convertSize = String.format("%dx%d>", size, size);
+        Path destDirPath = Paths.get(destDir);
+        try {
+            Files.createDirectories(destDirPath);
+        } catch (IOException e2) {
+        }
 
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(sourceDir))) {
             for (Path p : dirStream) {
                 String inputAbsolutePath = p.toAbsolutePath().toString();
-                String outputAbsolutePath = Paths.get(destDir).resolve(p.getFileName()).toAbsolutePath().toString();
+                String outputAbsolutePath = destDirPath.resolve(p.getFileName()).toAbsolutePath().toString();
                 try {
                     ShellScriptReturnValue result = ShellScript.callShell(
                             Arrays.asList(gmPath, "convert", inputAbsolutePath, "-resize", convertSize, outputAbsolutePath),
@@ -193,13 +208,27 @@ public class SudanExportPreparationPlugin implements IStepPluginVersion2 {
             return false;
         }
         if (watermarkDescriptions.isEmpty()) {
+            LogEntry le = LogEntry.build(step.getProcessId())
+                    .withCreationDate(new Date())
+                    .withContent("Could not find any watermark configuration for this process - not watermarking")
+                    .withType(LogType.INFO)
+                    .withUsername("automatic");
+            ProcessManager.saveLogEntry(le);
             return true;
         }
         boolean preRenderOK = preRenderWatermarkImages(convertPath, watermarkDescriptions);
         if (!preRenderOK) {
             return false;
         }
-        String destDir = projectAndStepConfig.getString("destDir", "media");
+        org.goobi.beans.Process process = step.getProzess();
+        String destDir = null;
+        try {
+            destDir = process.getConfiguredImageFolder(projectAndStepConfig.getString("destDir", "media"));
+        } catch (IOException | InterruptedException | SwapException | DAOException e) {
+            writeErrorToProcessLog("Error reading configured input and output folders");
+            log.error(e);
+            return false;
+        }
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(destDir))) {
             //for each image, composite image with watermarks
             for (Path canvasImage : dirStream) {
@@ -284,7 +313,7 @@ public class SudanExportPreparationPlugin implements IStepPluginVersion2 {
         DigitalDocument digDoc = step.getProzess().readMetadataFile().getDigitalDocument();
         Prefs prefs = step.getProzess().getRegelsatz().getPreferences();
         String collectionName = getMedatataValue("singleDigCollection", digDoc, prefs);
-        String mediaType = getMedatataValue("singleDigCollection", digDoc, prefs);
+        String mediaType = getMedatataValue("Type", digDoc, prefs);
 
         return findWatermarkDescriptions(collectionName, mediaType, this.projectAndStepConfig);
     }
