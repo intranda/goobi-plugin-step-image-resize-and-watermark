@@ -17,21 +17,26 @@
         <destDir>media</destDir>
         
         <!-- The maximum size of the longest side of an image -->
-        <resizeTo>1500</resizeTo>
         
-        <watermark collection="mycollection" mediaType="*">
-            <image>/opt/digiverso/goobi/scripts/watermark1.png</image>
-            <location>southeast</location>
-            <xDistance>100</xDistance>
-            <yDistance>100</yDistance>
-        </watermark>
+        <imageConfig collection="mycollection" mediaType="*">
+            <resizeTo>1500</resizeTo>
+            <watermark>
+                <image>/opt/digiverso/goobi/scripts/watermark1.png</image>
+                <location>southeast</location>
+                <xDistance>100</xDistance>
+                <yDistance>100</yDistance>
+            </watermark>
+        </imageConfig>
         
-        <watermark collection="myothercollection" mediaType="*">
-            <text>My watermark text</text>
-            <location>southeast</location>
-            <xDistance>600</xDistance>
-            <yDistance>100</yDistance>
-        </watermark>
+        <imageConfig collection="myothercollection" mediaType="*">
+            <resizeTo>1500</resizeTo>
+            <watermark>
+                <text>My watermark text</text>
+                <location>southeast</location>
+                <xDistance>600</xDistance>
+                <yDistance>100</yDistance>
+            </watermark>
+        </imageConfig>
         
     </config>
 </config_plugin>

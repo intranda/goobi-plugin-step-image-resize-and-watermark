@@ -155,7 +155,18 @@ public class SudanExportPreparationPlugin implements IStepPluginVersion2 {
             return false;
         }
 
-        int size = projectAndStepConfig.getInt("resizeTo", 1500);
+        int size = 1500;
+        try {
+            size = getResizeSize();
+        } catch (PreferencesException | ReadException | WriteException | IOException | InterruptedException | SwapException | DAOException e3) {
+            writeErrorToProcessLog("Error reading metadata to determine resizing size.");
+            log.error(e3);
+            return false;
+        }
+        if (size == 0) {
+            writeErrorToProcessLog("There is no image size configured for this process. Please check the plugin configuration.");
+            return false;
+        }
         String convertSize = String.format("%dx%d>", size, size);
         Path destDirPath = Paths.get(destDir);
         try {
@@ -185,6 +196,21 @@ public class SudanExportPreparationPlugin implements IStepPluginVersion2 {
             return false;
         }
         return true;
+    }
+
+    private int getResizeSize()
+            throws PreferencesException, ReadException, WriteException, IOException, InterruptedException, SwapException, DAOException {
+        DigitalDocument digDoc = step.getProzess().readMetadataFile().getDigitalDocument();
+        Prefs prefs = step.getProzess().getRegelsatz().getPreferences();
+        String collectionName = getMedatataValue("singleDigCollection", digDoc, prefs);
+        String mediaType = getMedatataValue("Type", digDoc, prefs);
+
+        List<HierarchicalConfiguration> imageConfigs = findImageConfigs(collectionName, mediaType, projectAndStepConfig);
+        if (imageConfigs.isEmpty()) {
+            return 0;
+        }
+
+        return imageConfigs.get(0).getInt("./resizeTo", 0);
     }
 
     private void writeErrorToProcessLog(String content) {
@@ -332,22 +358,34 @@ public class SudanExportPreparationPlugin implements IStepPluginVersion2 {
         return null;
     }
 
-    public static List<WatermarkDescription> findWatermarkDescriptions(String wnatedCollectionName, String wantedMediaType,
+    public static List<WatermarkDescription> findWatermarkDescriptions(String wantedCollectionName, String wantedMediaType,
             SubnodeConfiguration config) {
         List<WatermarkDescription> descriptions = new ArrayList<WatermarkDescription>();
-        List<HierarchicalConfiguration> watermarkConfigs = config.configurationsAt("./watermark");
-        if (watermarkConfigs == null) {
-            return null;
-        }
-        for (HierarchicalConfiguration watermarkConfig : watermarkConfigs) {
-            if (watermarkConfig.getString("@collection", "").equals(wnatedCollectionName)) {
-                String confMediaType = watermarkConfig.getString("@mediaType", "");
-                if (confMediaType.equals("*") || confMediaType.equals(wantedMediaType)) {
-                    descriptions.add(descriptionFromConfig(watermarkConfig));
-                }
+        List<HierarchicalConfiguration> imageConfigs = findImageConfigs(wantedCollectionName, wantedMediaType, config);
+        for (HierarchicalConfiguration imageConfig : imageConfigs) {
+            for (HierarchicalConfiguration watermarkConfig : imageConfig.configurationsAt("./watermark")) {
+                descriptions.add(descriptionFromConfig(watermarkConfig));
             }
         }
         return descriptions;
+    }
+
+    private static List<HierarchicalConfiguration> findImageConfigs(String wantedCollectionName, String wantedMediaType,
+            SubnodeConfiguration config) {
+        List<HierarchicalConfiguration> allImageConfigs = config.configurationsAt("./imageConfig");
+        if (allImageConfigs == null) {
+            return new ArrayList<HierarchicalConfiguration>();
+        }
+        List<HierarchicalConfiguration> filteredImageConfigs = new ArrayList<>();
+        for (HierarchicalConfiguration imageConfig : allImageConfigs) {
+            if (imageConfig.getString("@collection", "").equals(wantedCollectionName)) {
+                String confMediaType = imageConfig.getString("@mediaType", "");
+                if (confMediaType.equals("*") || confMediaType.equals(wantedMediaType)) {
+                    filteredImageConfigs.add(imageConfig);
+                }
+            }
+        }
+        return filteredImageConfigs;
     }
 
     private static WatermarkDescription descriptionFromConfig(HierarchicalConfiguration watermarkConfig) {
