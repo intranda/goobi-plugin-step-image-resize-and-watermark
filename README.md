@@ -1,17 +1,22 @@
-# Goobi workflow Plugin: goobi-plugin-step-sudan-export-preparation
+# Goobi workflow Plugin: goobi-plugin-step-image-resize-and-watermark
 
-Scales images down to a specific size and adds watermarks.
+<img src="https://goobi.io/wp-content/uploads/logo_goobi_plugin.png" align="right" style="margin:0 0 20px 20px;" alt="Plugin for Goobi workflow" width="175" height="109">
+
+This step plugin allows to scale images down to a specific size of the longest side and adds a configurable watermark. The input and output folder can be configured as well.
+
+This is a plugin for Goobi workflow, the open source workflow tracking software for digitisation projects. More information about Goobi workflow is available under https://goobi.io. If you want to get in touch with the user community simply go to https://community.goobi.io.
 
 ## Plugin details
 
-More information about the functionality of this plugin and the complete documentation can be found in the central documentation area at https://docs.intranda.com
+More information about the functionality of this plugin and the complete documentation can be found in the central documentation area at https://docs.goobi.io
 
 Detail | Description
 --- | ---
-**Plugin identifier**       | goobi-plugin-step-sudan-export-preparation
-**Plugin type**             | 
-**Documentation (German)**  | https://docs.intranda.com/
-**Documentation (English)** | - still to be translated -
+**Plugin identifier**       | intranda_step_fileUpload
+**Plugin type**             | Step plugin
+**Licence**                 | GPL 2.0 or newer  
+**Documentation (German)**  | https://docs.goobi.io/goobi-workflow-plugins-de/step/intranda_step_fileupload
+**Documentation (English)** | https://docs.goobi.io/goobi-workflow-plugins-en/step/intranda_step_fileupload
 
 ## Goobi details
 
@@ -33,4 +38,3 @@ Contact | Details
 **Address**       | Bertha-von-Suttner-Str. 9, 37085 Göttingen, Germany
 **Web site**      | https://www.intranda.com
 **Twitter**       | https://twitter.com/intranda
-

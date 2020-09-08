@@ -1,4 +1,4 @@
-package de.intranda.goobi.plugins.sudanexportpreparation;
+package de.intranda.goobi.plugins.imageresize;
 
 import java.nio.file.Path;
 

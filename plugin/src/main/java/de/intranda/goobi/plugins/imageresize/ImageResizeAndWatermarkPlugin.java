@@ -1,4 +1,4 @@
-package de.intranda.goobi.plugins.sudanexportpreparation;
+package de.intranda.goobi.plugins.imageresize;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -45,9 +45,9 @@ import ugh.exceptions.WriteException;
 
 @PluginImplementation
 @Log4j2
-public class SudanExportPreparationPlugin implements IStepPluginVersion2 {
+public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
 
-    private static String TITLE = "intranda_step_sudan-export-preparation";
+    private static String TITLE = "intranda_step_image_resize_and_watermark";
     private Step step;
     private XMLConfiguration pluginConfig;
     private SubnodeConfiguration projectAndStepConfig;
@@ -324,7 +324,7 @@ public class SudanExportPreparationPlugin implements IStepPluginVersion2 {
     }
 
     private Path renderWatermarkText(WatermarkDescription watermarkDescription, String convertPath) throws IOException, InterruptedException {
-        // command to create watermark-file when text: 
+        // command to create watermark-file when text:
         //convert -size 450x200 -background none -font Arial -fill white -gravity center caption:"Goobi.io" -shade 240x40 WATERMARK_FILE.png
         String tempDir = System.getProperty("java.io.tmpdir");
         Path watermarkFile = Paths.get(tempDir, "watermark_" + UUID.randomUUID().toString() + ".png");
