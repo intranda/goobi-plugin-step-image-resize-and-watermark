@@ -378,7 +378,7 @@ public class SudanExportPreparationPlugin implements IStepPluginVersion2 {
         }
         List<HierarchicalConfiguration> filteredImageConfigs = new ArrayList<>();
         for (HierarchicalConfiguration imageConfig : allImageConfigs) {
-            if (imageConfig.getString("@collection", "").equals(wantedCollectionName)) {
+            if (imageConfig.getString("@collection", "").equals("*") || imageConfig.getString("@collection", "").equals(wantedCollectionName)) {
                 String confMediaType = imageConfig.getString("@mediaType", "");
                 if (confMediaType.equals("*") || confMediaType.equals(wantedMediaType)) {
                     filteredImageConfigs.add(imageConfig);
