@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 
-<project name="goobi-plugin-step-mixedocr" default="devbuild">
+<project name="goobi-plugin-step-image-resize-and-watermark" default="devbuild">
 	<target name="devbuild">
 		<exec executable="mvn">
 			<arg value="package" />
 		</exec>
-		<copy file="target/plugin_intranda_step_sudan-export-preparation.jar" todir="/opt/digiverso/goobi/plugins/step/"/>
+		<copy file="target/plugin_intranda_step_image_resize_and_watermark.jar" todir="/opt/digiverso/goobi/plugins/step/"/>
 	</target>
 </project>

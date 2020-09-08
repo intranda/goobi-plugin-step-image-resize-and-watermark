@@ -1,4 +1,4 @@
-package de.intranda.goobi.plugins.sudanexportpreparation;
+package de.intranda.goobi.plugins.imageresize;
 
 import static org.junit.Assert.assertTrue;
 
@@ -17,10 +17,10 @@ public class TestSudanExportPreparationPlugin {
     public void testFindWatermarkDescriptions() throws ConfigurationException, IOException {
         XMLConfiguration xmlConfig = readConfig();
         SubnodeConfiguration config = xmlConfig.configurationAt("//config[./project = '*'][./step = '*']");
-        List<WatermarkDescription> shouldBeEmpty = SudanExportPreparationPlugin.findWatermarkDescriptions("", "", config);
+        List<WatermarkDescription> shouldBeEmpty = ImageResizeAndWatermarkPlugin.findWatermarkDescriptions("", "", config);
         assertTrue("list for no collection/media type should be empty", shouldBeEmpty.isEmpty());
 
-        List<WatermarkDescription> shouldNotBeEmpty = SudanExportPreparationPlugin.findWatermarkDescriptions("mycollection", "", config);
+        List<WatermarkDescription> shouldNotBeEmpty = ImageResizeAndWatermarkPlugin.findWatermarkDescriptions("mycollection", "", config);
         assertTrue("list for for 'mycollection' should not be empty", !shouldNotBeEmpty.isEmpty());
     }
 

@@ -55,6 +55,7 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
     @Override
     public void initialize(Step step, String returnPath) {
         this.step = step;
+        
         String projectName = step.getProzess().getProjekt().getTitel();
         pluginConfig = ConfigPlugins.getPluginConfig(TITLE);
         pluginConfig.setExpressionEngine(new XPathExpressionEngine());
