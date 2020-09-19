@@ -12,13 +12,11 @@ More information about the functionality of this plugin and the complete documen
 
 Detail | Description
 --- | ---
-**Plugin identifier**       | intranda_step_fileUpload
+**Plugin identifier**       | intranda_step_image_resize_and_watermark
 **Plugin type**             | Step plugin
 **Licence**                 | GPL 2.0 or newer  
-**Documentation (German)**  | https://docs.goobi.io/goobi-workflow-plugins-de/step/intranda_step_fileupload
-**Documentation (English)** | https://docs.goobi.io/goobi-workflow-plugins-en/step/intranda_step_fileupload
-
-## Goobi details
+**Documentation (German)**  | https://docs.goobi.io/goobi-workflow-plugins-de/step/intranda_step_image_resize_and_watermark
+**Documentation (English)** | https://docs.goobi.io/goobi-workflow-plugins-en/step/intranda_step_image_resize_and_watermark
 
 Goobi workflow is an open source web application to manage small and large digitisation projects mostly in cultural heritage institutions all around the world. More information about Goobi can be found here:
 
