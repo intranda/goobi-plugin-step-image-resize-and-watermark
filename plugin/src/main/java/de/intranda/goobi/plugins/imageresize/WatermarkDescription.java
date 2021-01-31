@@ -14,4 +14,7 @@ public class WatermarkDescription {
     private String location; //imagemagick gravity: north, northeast, east, southeast...
     private int xDistance;
     private int yDistance;
+    private String font;
+    private String textBox;
+    private String imageBox;
 }

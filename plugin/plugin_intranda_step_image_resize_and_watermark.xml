@@ -22,6 +22,7 @@
             <resizeTo>1500</resizeTo>
             <watermark>
                 <image>/opt/digiverso/goobi/scripts/watermark1.png</image>
+                <imageBox>240x40</imageBox>
                 <location>southeast</location>
                 <xDistance>100</xDistance>
                 <yDistance>100</yDistance>
@@ -32,6 +33,8 @@
             <resizeTo>1500</resizeTo>
             <watermark>
                 <text>My watermark text</text>
+                <textBox>450x200</textBox>
+                <font>Open-Sans</font>
                 <location>southeast</location>
                 <xDistance>600</xDistance>
                 <yDistance>100</yDistance>

@@ -148,7 +148,7 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
         String sourceDir = null;
         String destDir = null;
         try {
-            sourceDir = process.getConfiguredImageFolder(projectAndStepConfig.getString("sourceDir", "cropped"));
+            sourceDir = process.getConfiguredImageFolder(projectAndStepConfig.getString("sourceDir", "media"));
             destDir = process.getConfiguredImageFolder(projectAndStepConfig.getString("destDir", "media"));
         } catch (IOException | InterruptedException | SwapException | DAOException e2) {
             writeErrorToProcessLog("Error reading configured input and output folders");
@@ -329,9 +329,12 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
         //convert -size 450x200 -background none -font Arial -fill white -gravity center caption:"Goobi.io" -shade 240x40 WATERMARK_FILE.png
         String tempDir = System.getProperty("java.io.tmpdir");
         Path watermarkFile = Paths.get(tempDir, "watermark_" + UUID.randomUUID().toString() + ".png");
-        ShellScript.callShell(Arrays.asList(convertPath, "-size", "450x200", "-background", "none", "-font", "Arial",
-                "-fill", "white", "-gravity", "center", String.format("caption:\"%s\"", watermarkDescription.getText()),
-                "-shade", "240x40", watermarkFile.toAbsolutePath().toString()), step.getProcessId());
+//        ShellScript.callShell(Arrays.asList(convertPath, "-size", "450x200", "-background", "none", "-font", watermarkDescription.getFont(),
+//                "-fill", "white", "-gravity", "center", String.format("caption:\"%s\"", watermarkDescription.getText()),
+//                "-shade", "240x40", watermarkFile.toAbsolutePath().toString()), step.getProcessId());
+        ShellScript.callShell(Arrays.asList(convertPath, "-size", watermarkDescription.getTextBox(), "-background", "none", "-font", watermarkDescription.getFont(),
+                "-fill", "white", "-gravity", "center", "caption:" + watermarkDescription.getText(),
+                "-shade", watermarkDescription.getImageBox(), watermarkFile.toAbsolutePath().toString()), step.getProcessId());
         return watermarkFile;
     }
 
@@ -396,8 +399,10 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
         String location = watermarkConfig.getString("location", "southeast");
         int xDistance = watermarkConfig.getInt("xDistance", 100);
         int yDistance = watermarkConfig.getInt("yDistance", 100);
-
-        return new WatermarkDescription(imagePath != null, imagePath, text, location, xDistance, yDistance);
+        String font = watermarkConfig.getString("font", "Open-Sans");
+        String textBox = watermarkConfig.getString("textBox", "450x200");
+        String imageBox = watermarkConfig.getString("imageBox", "240x40");
+        return new WatermarkDescription(imagePath != null, imagePath, text, location, xDistance, yDistance, font, textBox, imageBox);
     }
 
     @Override
