@@ -15,6 +15,6 @@ public class WatermarkDescription {
     private int xDistance;
     private int yDistance;
     private String font;
-    private String textBox;
-    private String imageBox;
+    private String boxSize;
+    private String shadeSize;
 }

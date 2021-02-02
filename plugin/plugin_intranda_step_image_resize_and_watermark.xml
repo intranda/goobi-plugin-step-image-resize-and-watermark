@@ -12,34 +12,51 @@
         <!-- which projects to use for (can be more than one, otherwise use *) -->
         <project>*</project>
         <step>*</step>
-        
+
+        <!-- the source directory from which the images will be taken -->
         <sourceDir>cropped</sourceDir>
+        <!-- the destination directory where the scaled and watermarked images will reside -->
         <destDir>media</destDir>
-        
-        <!-- The maximum size of the longest side of an image -->
-        
-        <imageConfig collection="mycollection" mediaType="*">
+
+        <!-- only use this block with processes in collection "mycollection"
+             and with mediaType "book" -->
+        <imageConfig collection="mycollection" mediaType="book">
+            <!-- The maximum size of the longest side of an image -->
             <resizeTo>1500</resizeTo>
+            <!-- The watermark configuration -->
             <watermark>
-                <image>/opt/digiverso/goobi/scripts/watermark1.png</image>
-                <imageBox>240x40</imageBox>
+                <!-- the image to use for watermarking -->
+                <image>/opt/digiverso/goobi/xslt/logo.png</image>
+                <!-- define the shade size here -->
+                <shadeSize>240x40</shadeSize>
+                <!-- the location of the watermark. Possible values: north,
+                     northeast, east, southeast, south, southwest,
+                     west, northwest -->
                 <location>southeast</location>
+                <!-- these are the distances to the edges on the x- resp. y-axis -->
                 <xDistance>100</xDistance>
                 <yDistance>100</yDistance>
             </watermark>
         </imageConfig>
-        
+
+        <!-- use this block with processes in collection "myothercollection"
+             and any mediaType -->
         <imageConfig collection="myothercollection" mediaType="*">
             <resizeTo>1500</resizeTo>
             <watermark>
+                <!-- you can also use a text-only watermark. -->
                 <text>My watermark text</text>
-                <textBox>450x200</textBox>
+                <!-- define the shade size here -->
+                <shadeSize>240x40</shadeSize>
+                <!-- define the size of the box for the text -->
+                <boxSize>450x200</boxSize>
+                <!-- font to use for the text rendering -->
                 <font>Open-Sans</font>
                 <location>southeast</location>
                 <xDistance>600</xDistance>
                 <yDistance>100</yDistance>
             </watermark>
         </imageConfig>
-        
+
     </config>
 </config_plugin>

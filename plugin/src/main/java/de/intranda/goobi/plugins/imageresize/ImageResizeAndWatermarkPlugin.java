@@ -332,9 +332,9 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
 //        ShellScript.callShell(Arrays.asList(convertPath, "-size", "450x200", "-background", "none", "-font", watermarkDescription.getFont(),
 //                "-fill", "white", "-gravity", "center", String.format("caption:\"%s\"", watermarkDescription.getText()),
 //                "-shade", "240x40", watermarkFile.toAbsolutePath().toString()), step.getProcessId());
-        ShellScript.callShell(Arrays.asList(convertPath, "-size", watermarkDescription.getTextBox(), "-background", "none", "-font", watermarkDescription.getFont(),
+        ShellScript.callShell(Arrays.asList(convertPath, "-size", watermarkDescription.getBoxSize(), "-background", "none", "-font", watermarkDescription.getFont(),
                 "-fill", "white", "-gravity", "center", "caption:" + watermarkDescription.getText(),
-                "-shade", watermarkDescription.getImageBox(), watermarkFile.toAbsolutePath().toString()), step.getProcessId());
+                "-shade", watermarkDescription.getShadeSize(), watermarkFile.toAbsolutePath().toString()), step.getProcessId());
         return watermarkFile;
     }
 
@@ -400,9 +400,9 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
         int xDistance = watermarkConfig.getInt("xDistance", 100);
         int yDistance = watermarkConfig.getInt("yDistance", 100);
         String font = watermarkConfig.getString("font", "Open-Sans");
-        String textBox = watermarkConfig.getString("textBox", "450x200");
-        String imageBox = watermarkConfig.getString("imageBox", "240x40");
-        return new WatermarkDescription(imagePath != null, imagePath, text, location, xDistance, yDistance, font, textBox, imageBox);
+        String boxSize = watermarkConfig.getString("boxSize", "450x200");
+        String shadeSize = watermarkConfig.getString("shadeSize", "240x40");
+        return new WatermarkDescription(imagePath != null, imagePath, text, location, xDistance, yDistance, font, boxSize, shadeSize);
     }
 
     @Override
