@@ -55,7 +55,7 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
     @Override
     public void initialize(Step step, String returnPath) {
         this.step = step;
-        
+
         String projectName = step.getProzess().getProjekt().getTitel();
         pluginConfig = ConfigPlugins.getPluginConfig(TITLE);
         pluginConfig.setExpressionEngine(new XPathExpressionEngine());
@@ -181,7 +181,7 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
                 String outputAbsolutePath = destDirPath.resolve(p.getFileName()).toAbsolutePath().toString();
                 try {
                     ShellScriptReturnValue result = ShellScript.callShell(
-                            Arrays.asList(gmPath, "convert", inputAbsolutePath, "-resize", convertSize, outputAbsolutePath),
+                            Arrays.asList(gmPath, "convert", "-auto-orient", inputAbsolutePath, "-resize", convertSize, outputAbsolutePath),
                             this.step.getProcessId());
                     if (result.getReturnCode() != 0) {
                         writeErrorToProcessLog("Error converting image. Command output:\n" + result.getErrorText());
@@ -329,12 +329,14 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
         //convert -size 450x200 -background none -font Arial -fill white -gravity center caption:"Goobi.io" -shade 240x40 WATERMARK_FILE.png
         String tempDir = System.getProperty("java.io.tmpdir");
         Path watermarkFile = Paths.get(tempDir, "watermark_" + UUID.randomUUID().toString() + ".png");
-//        ShellScript.callShell(Arrays.asList(convertPath, "-size", "450x200", "-background", "none", "-font", watermarkDescription.getFont(),
-//                "-fill", "white", "-gravity", "center", String.format("caption:\"%s\"", watermarkDescription.getText()),
-//                "-shade", "240x40", watermarkFile.toAbsolutePath().toString()), step.getProcessId());
-        ShellScript.callShell(Arrays.asList(convertPath, "-size", watermarkDescription.getBoxSize(), "-background", "none", "-font", watermarkDescription.getFont(),
-                "-fill", "white", "-gravity", "center", "caption:" + watermarkDescription.getText(),
-                "-shade", watermarkDescription.getShadeSize(), watermarkFile.toAbsolutePath().toString()), step.getProcessId());
+        //        ShellScript.callShell(Arrays.asList(convertPath, "-size", "450x200", "-background", "none", "-font", watermarkDescription.getFont(),
+        //                "-fill", "white", "-gravity", "center", String.format("caption:\"%s\"", watermarkDescription.getText()),
+        //                "-shade", "240x40", watermarkFile.toAbsolutePath().toString()), step.getProcessId());
+        ShellScript.callShell(
+                Arrays.asList(convertPath, "-size", watermarkDescription.getBoxSize(), "-background", "none", "-font", watermarkDescription.getFont(),
+                        "-fill", "white", "-gravity", "center", "caption:" + watermarkDescription.getText(),
+                        "-shade", watermarkDescription.getShadeSize(), watermarkFile.toAbsolutePath().toString()),
+                step.getProcessId());
         return watermarkFile;
     }
 
