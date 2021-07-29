@@ -28,7 +28,6 @@ import org.goobi.production.plugin.interfaces.IStepPluginVersion2;
 
 import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.helper.ShellScript;
-import de.sub.goobi.helper.ShellScriptReturnValue;
 import de.sub.goobi.helper.exceptions.DAOException;
 import de.sub.goobi.helper.exceptions.SwapException;
 import de.sub.goobi.persistence.managers.ProcessManager;
@@ -180,11 +179,11 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
                 String inputAbsolutePath = p.toAbsolutePath().toString();
                 String outputAbsolutePath = destDirPath.resolve(p.getFileName()).toAbsolutePath().toString();
                 try {
-                    ShellScriptReturnValue result = ShellScript.callShell(
-                            Arrays.asList(gmPath, "convert", "-auto-orient", inputAbsolutePath, "-resize", convertSize, outputAbsolutePath),
-                            this.step.getProcessId());
-                    if (result.getReturnCode() != 0) {
-                        writeErrorToProcessLog("Error converting image. Command output:\n" + result.getErrorText());
+                    ShellScript shell = new ShellScript(Paths.get(gmPath));
+                    int returnCode = shell.run(
+                            Arrays.asList("convert", "-auto-orient", inputAbsolutePath, "-resize", convertSize, outputAbsolutePath));
+                    if (returnCode != 0) {
+                        writeErrorToProcessLog("Error converting image. Command output:\n" + shell.getStdErr());
                         return false;
                     }
                 } catch (InterruptedException e) {
@@ -276,23 +275,100 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
 
     private boolean renderWatermarkToImage(Path canvasImage, WatermarkDescription wd) {
         //gm composite -dissolve 50% -geometry +550+400 -gravity southeast WATERMARK_FILE.png canvas.tif result.tif
+        int[] canvasDimensions = getImageDimensions(canvasImage);
+        int[] watermarkDimensions = getImageDimensions(wd.getImagePath());
+        if (canvasDimensions == null || watermarkDimensions == null) {
+            return false;
+        }
+        Path watermarkImagePath = resizeWatermarkIfNecessary(wd.getImagePath(), canvasDimensions, watermarkDimensions);
+        if (watermarkImagePath == null) {
+            return false;
+        }
         String gmPath = pluginConfig.getString("gmPath", "/usr/bin/gm");
-        List<String> command = Arrays.asList(gmPath, "composite", "-dissolve", "50%", "-geometry",
+        List<String> params = Arrays.asList("composite", "-dissolve", "50%", "-geometry",
                 String.format("+%d+%d", wd.getXDistance(), wd.getYDistance()), "-gravity",
-                wd.getLocation(), wd.getImagePath().toAbsolutePath().toString(), canvasImage.toAbsolutePath().toString(),
+                wd.getLocation(), watermarkImagePath.toAbsolutePath().toString(), canvasImage.toAbsolutePath().toString(),
                 canvasImage.toAbsolutePath().toString());
         try {
-            ShellScriptReturnValue ret = ShellScript.callShell(command, step.getProcessId());
-            if (ret.getReturnCode() != 0) {
-                writeErrorToProcessLog("Error watermarking image. Process output was:\n" + ret.getErrorText());
+            ShellScript shell = new ShellScript(Paths.get(gmPath));
+            int returnCode = shell.run(params);
+            if (returnCode != 0) {
+                writeErrorToProcessLog("Error watermarking image. Process output was:\n" + shell.getStdErr());
                 return false;
             }
         } catch (IOException | InterruptedException e) {
             writeErrorToProcessLog("Error watermarking image.");
             log.error(e);
             return false;
+        } finally {
+            if (!watermarkImagePath.equals(wd.getImagePath())) {
+                try {
+                    Files.delete(watermarkImagePath);
+                } catch (IOException e) {
+                    log.error(e);
+                }
+            }
         }
         return true;
+    }
+
+    private Path resizeWatermarkIfNecessary(Path imagePath, int[] canvasDimensions, int[] watermarkDimensions) {
+        double scaleFactorX = 1;
+        double scaleFactorY = 1;
+        if (canvasDimensions[0] - 200 < watermarkDimensions[0]) {
+            scaleFactorX = ((double) canvasDimensions[0] - 200) / (watermarkDimensions[0]);
+        }
+        if (canvasDimensions[1] - 200 < watermarkDimensions[1]) {
+            scaleFactorY = ((double) canvasDimensions[1] - 200) / (watermarkDimensions[1]);
+        }
+        int scaleFactor = (int) (Math.min(scaleFactorX, scaleFactorY) * 100);
+        if (scaleFactor < 100) {
+            String filename = imagePath.getFileName().toString();
+            String basename = filename.substring(0, filename.lastIndexOf('.'));
+            String tmpdir = System.getProperty("java.io.tmpdir");
+            Path resizedWatermark = Paths.get(tmpdir, basename + "_resized_" + UUID.randomUUID().toString() + ".png");
+            String gmPath = pluginConfig.getString("gmPath", "/usr/bin/gm");
+            List<String> params = Arrays.asList("convert", imagePath.toAbsolutePath().toString(), "-resize", Integer.toString(scaleFactor) + "%",
+                    resizedWatermark.toAbsolutePath().toString());
+            try {
+                ShellScript shell = new ShellScript(Paths.get(gmPath));
+                int ret = shell.run(params);
+                if (ret != 0) {
+                    writeErrorToProcessLog("Error watermarking image. Process output was:\n" + shell.getStdErr());
+                    return null;
+                }
+            } catch (IOException | InterruptedException e) {
+                writeErrorToProcessLog("Error watermarking image.");
+                log.error(e);
+                return null;
+            }
+            return resizedWatermark;
+        }
+        return imagePath;
+    }
+
+    private int[] getImageDimensions(Path imagePath) {
+        String gmPath = pluginConfig.getString("gmPath", "/usr/bin/gm");
+        List<String> params = Arrays.asList("identify", "-ping", "-format", "%w %h", imagePath.toAbsolutePath().toString());
+        try {
+            ShellScript shell = new ShellScript(Paths.get(gmPath));
+            int ret = shell.run(params);
+            if (ret != 0) {
+                writeErrorToProcessLog("Error watermarking image. Process output was:\n" + shell.getStdErr());
+                return null;
+            }
+            if (shell.getStdOut().isEmpty()) {
+                writeErrorToProcessLog("Error watermarking image: Unexpected output from identify.");
+                return null;
+            }
+            String[] split = shell.getStdOut().get(0).trim().split(" ");
+            int[] dimensions = Arrays.stream(split).mapToInt(Integer::parseInt).toArray();
+            return dimensions;
+        } catch (IOException | InterruptedException e) {
+            writeErrorToProcessLog("Error watermarking image.");
+            log.error(e);
+            return null;
+        }
     }
 
     private void cleanupTempWatermarkImages(List<WatermarkDescription> watermarkDescriptions) {
