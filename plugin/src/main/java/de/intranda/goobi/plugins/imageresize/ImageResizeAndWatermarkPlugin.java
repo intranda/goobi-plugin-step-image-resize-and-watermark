@@ -186,6 +186,14 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
                         writeErrorToProcessLog("Error converting image. Command output:\n" + shell.getStdErr());
                         return false;
                     }
+                    //make sure the orientation tag is gone, so the image is displayed in a sane way
+                    ShellScript shell2 = new ShellScript(Paths.get("/usr/bin/exiftool"));
+                    int returnCode2 = shell2.run(
+                            Arrays.asList("-Orientation=", outputAbsolutePath));
+                    if (returnCode2 != 0) {
+                        writeErrorToProcessLog("Error converting image. Command output:\n" + shell2.getStdErr());
+                        return false;
+                    }
                 } catch (InterruptedException e) {
                     log.error(e);
                 }
