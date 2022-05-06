@@ -141,7 +141,8 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
 
     private boolean resizeImages() {
         String gmPath = pluginConfig.getString("gmPath", "/usr/bin/gm");
-
+        String exifPath = pluginConfig.getString("exifToolPath", "/usr/bin/exiftool");
+        
         org.goobi.beans.Process process = step.getProzess();
 
         String sourceDir = null;
@@ -187,9 +188,9 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
                         return false;
                     }
                     //make sure the orientation tag is gone, so the image is displayed in a sane way
-                    ShellScript shell2 = new ShellScript(Paths.get("/usr/bin/exiftool"));
+                    ShellScript shell2 = new ShellScript(Paths.get(exifPath));
                     int returnCode2 = shell2.run(
-                            Arrays.asList("-Orientation=", outputAbsolutePath));
+                            Arrays.asList("-Orientation=", outputAbsolutePath, "-overwrite_original"));
                     if (returnCode2 != 0) {
                         writeErrorToProcessLog("Error converting image. Command output:\n" + shell2.getStdErr());
                         return false;
@@ -242,12 +243,12 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
             return false;
         }
         if (watermarkDescriptions.isEmpty()) {
-            LogEntry le = LogEntry.build(step.getProcessId())
-                    .withCreationDate(new Date())
-                    .withContent("Could not find any watermark configuration for this process - not watermarking")
-                    .withType(LogType.INFO)
-                    .withUsername("automatic");
-            ProcessManager.saveLogEntry(le);
+//            LogEntry le = LogEntry.build(step.getProcessId())
+//                    .withCreationDate(new Date())
+//                    .withContent("Could not find any watermark configuration for this process - not watermarking")
+//                    .withType(LogType.DEBUG)
+//                    .withUsername("automatic");
+//            ProcessManager.saveLogEntry(le);
             return true;
         }
         boolean preRenderOK = preRenderWatermarkImages(convertPath, watermarkDescriptions);

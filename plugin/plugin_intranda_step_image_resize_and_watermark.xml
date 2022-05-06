@@ -1,6 +1,8 @@
 <config_plugin>
     <gmPath>/usr/bin/gm</gmPath>
     <convertPath>/usr/bin/convert</convertPath>
+    <exifToolPath>/usr/bin/exiftool</exifToolPath>
+    
     <!--
         order of configuration is:
           1.) project name and step name matches
