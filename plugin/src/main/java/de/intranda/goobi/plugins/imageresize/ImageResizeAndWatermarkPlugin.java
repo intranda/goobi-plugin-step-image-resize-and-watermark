@@ -142,7 +142,7 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
     private boolean resizeImages() {
         String gmPath = pluginConfig.getString("gmPath", "/usr/bin/gm");
         String exifPath = pluginConfig.getString("exifToolPath", "/usr/bin/exiftool");
-        
+
         org.goobi.beans.Process process = step.getProzess();
 
         String sourceDir = null;
@@ -150,7 +150,7 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
         try {
             sourceDir = process.getConfiguredImageFolder(projectAndStepConfig.getString("sourceDir", "media"));
             destDir = process.getConfiguredImageFolder(projectAndStepConfig.getString("destDir", "media"));
-        } catch (IOException | InterruptedException | SwapException | DAOException e2) {
+        } catch (IOException | SwapException | DAOException e2) {
             writeErrorToProcessLog("Error reading configured input and output folders");
             log.error(e2);
             return false;
@@ -234,7 +234,7 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
     private boolean addWatermarks() {
         String convertPath = pluginConfig.getString("convertPath", "/usr/bin/convert");
         //first, find which (if any) watermark we want to render
-        List<WatermarkDescription> watermarkDescriptions = new ArrayList<WatermarkDescription>();
+        List<WatermarkDescription> watermarkDescriptions = new ArrayList<>();
         try {
             watermarkDescriptions = findWatermarkDescriptions();
         } catch (PreferencesException | ReadException | WriteException | IOException | InterruptedException | SwapException | DAOException e1) {
@@ -243,12 +243,12 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
             return false;
         }
         if (watermarkDescriptions.isEmpty()) {
-//            LogEntry le = LogEntry.build(step.getProcessId())
-//                    .withCreationDate(new Date())
-//                    .withContent("Could not find any watermark configuration for this process - not watermarking")
-//                    .withType(LogType.DEBUG)
-//                    .withUsername("automatic");
-//            ProcessManager.saveLogEntry(le);
+            //            LogEntry le = LogEntry.build(step.getProcessId())
+            //                    .withCreationDate(new Date())
+            //                    .withContent("Could not find any watermark configuration for this process - not watermarking")
+            //                    .withType(LogType.DEBUG)
+            //                    .withUsername("automatic");
+            //            ProcessManager.saveLogEntry(le);
             return true;
         }
         boolean preRenderOK = preRenderWatermarkImages(convertPath, watermarkDescriptions);
@@ -259,7 +259,7 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
         String destDir = null;
         try {
             destDir = process.getConfiguredImageFolder(projectAndStepConfig.getString("destDir", "media"));
-        } catch (IOException | InterruptedException | SwapException | DAOException e) {
+        } catch (IOException | SwapException | DAOException e) {
             writeErrorToProcessLog("Error reading configured input and output folders");
             log.error(e);
             return false;
@@ -451,7 +451,7 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
 
     public static List<WatermarkDescription> findWatermarkDescriptions(String wantedCollectionName, String wantedMediaType,
             SubnodeConfiguration config) {
-        List<WatermarkDescription> descriptions = new ArrayList<WatermarkDescription>();
+        List<WatermarkDescription> descriptions = new ArrayList<>();
         List<HierarchicalConfiguration> imageConfigs = findImageConfigs(wantedCollectionName, wantedMediaType, config);
         for (HierarchicalConfiguration imageConfig : imageConfigs) {
             for (HierarchicalConfiguration watermarkConfig : imageConfig.configurationsAt("./watermark")) {
@@ -465,7 +465,7 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
             SubnodeConfiguration config) {
         List<HierarchicalConfiguration> allImageConfigs = config.configurationsAt("./imageConfig");
         if (allImageConfigs == null) {
-            return new ArrayList<HierarchicalConfiguration>();
+            return new ArrayList<>();
         }
         List<HierarchicalConfiguration> filteredImageConfigs = new ArrayList<>();
         for (HierarchicalConfiguration imageConfig : allImageConfigs) {
