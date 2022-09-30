@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +16,6 @@ import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.configuration.tree.xpath.XPathExpressionEngine;
-import org.goobi.beans.LogEntry;
 import org.goobi.beans.Step;
 import org.goobi.production.enums.LogType;
 import org.goobi.production.enums.PluginGuiType;
@@ -27,10 +25,10 @@ import org.goobi.production.enums.StepReturnValue;
 import org.goobi.production.plugin.interfaces.IStepPluginVersion2;
 
 import de.sub.goobi.config.ConfigPlugins;
+import de.sub.goobi.helper.Helper;
 import de.sub.goobi.helper.ShellScript;
 import de.sub.goobi.helper.exceptions.DAOException;
 import de.sub.goobi.helper.exceptions.SwapException;
-import de.sub.goobi.persistence.managers.ProcessManager;
 import lombok.extern.log4j.Log4j2;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import ugh.dl.DigitalDocument;
@@ -223,12 +221,7 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
     }
 
     private void writeErrorToProcessLog(String content) {
-        LogEntry le = LogEntry.build(step.getProcessId())
-                .withCreationDate(new Date())
-                .withContent(content)
-                .withType(LogType.ERROR)
-                .withUsername("automatic");
-        ProcessManager.saveLogEntry(le);
+        Helper.addMessageToProcessJournal(step.getProcessId(), LogType.ERROR, content, "automatic");
     }
 
     private boolean addWatermarks() {
