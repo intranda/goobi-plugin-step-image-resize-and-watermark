@@ -3,6 +3,10 @@ title: Bildskalierung und Wasserzeichen rendern
 identifier: intranda_step_image_resize_and_watermark
 published: true
 description: Dieses Step Plugin skaliert Bilder auf konfigurierbare maximale Ausmaße und rendert ein Wasserzeichen in die skalierten Bilder.
+keywords:
+    - Goobi workflow
+    - Plugin
+    - Step Plugin
 ---
 ## Einführung
 Dieses Plugin erlaubt es, Bilder auf eine maximale Größe zu skalieren und anschließend Wasserzeichen in die zuvor skalierten Bilder zu rendern. Dabei ist die maximale Größe sowie das zu rendernde Wasserzeichen flexibel konfigurierbar.

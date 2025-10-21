@@ -3,6 +3,10 @@ title: Image scaling and watermarking
 identifier: intranda_step_image_resize_and_watermark
 published: true
 description: This step plugin scales images to configurable maximum sizes and renders a watermark into the scaled images.
+keywords:
+    - Goobi workflow
+    - Plugin
+    - Step Plugin
 ---
 ## Introduction
 This plugin allows you to scale images to a maximum size and then render watermarks into the previously scaled images. The maximum size and the watermark to be rendered can be configured flexibly.
