@@ -44,6 +44,7 @@ import ugh.exceptions.WriteException;
 @Log4j2
 public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
 
+    private static final long serialVersionUID = 3319849848521952597L;
     private static String TITLE = "intranda_step_image_resize_and_watermark";
     private Step step;
     private XMLConfiguration pluginConfig;
@@ -282,7 +283,7 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
         if (canvasDimensions == null || watermarkDimensions == null) {
             return false;
         }
-        Path watermarkImagePath = resizeWatermarkIfNecessary(wd.getImagePath(), canvasDimensions, watermarkDimensions);
+        Path watermarkImagePath = resizeWatermarkIfNecessary(wd.getImagePath(), canvasDimensions, watermarkDimensions, wd.getHeightPercent());
         if (watermarkImagePath == null) {
             return false;
         }
@@ -314,17 +315,23 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
         return true;
     }
 
-    private Path resizeWatermarkIfNecessary(Path imagePath, int[] canvasDimensions, int[] watermarkDimensions) {
-        double scaleFactorX = 1;
-        double scaleFactorY = 1;
-        if (canvasDimensions[0] - 200 < watermarkDimensions[0]) {
-            scaleFactorX = ((double) canvasDimensions[0] - 200) / (watermarkDimensions[0]);
+    private Path resizeWatermarkIfNecessary(Path imagePath, int[] canvasDimensions, int[] watermarkDimensions, double heightPercent) {
+        int scaleFactor;
+        if (heightPercent > 0) {
+            int targetHeight = (int) (canvasDimensions[1] * heightPercent / 100.0);
+            scaleFactor = (int) ((double) targetHeight / watermarkDimensions[1] * 100);
+        } else {
+            double scaleFactorX = 1;
+            double scaleFactorY = 1;
+            if (canvasDimensions[0] - 200 < watermarkDimensions[0]) {
+                scaleFactorX = ((double) canvasDimensions[0] - 200) / (watermarkDimensions[0]);
+            }
+            if (canvasDimensions[1] - 200 < watermarkDimensions[1]) {
+                scaleFactorY = ((double) canvasDimensions[1] - 200) / (watermarkDimensions[1]);
+            }
+            scaleFactor = (int) (Math.min(scaleFactorX, scaleFactorY) * 100);
         }
-        if (canvasDimensions[1] - 200 < watermarkDimensions[1]) {
-            scaleFactorY = ((double) canvasDimensions[1] - 200) / (watermarkDimensions[1]);
-        }
-        int scaleFactor = (int) (Math.min(scaleFactorX, scaleFactorY) * 100);
-        if (scaleFactor < 100) {
+        if (scaleFactor != 100) {
             String filename = imagePath.getFileName().toString();
             String basename = filename.substring(0, filename.lastIndexOf('.'));
             String tmpdir = System.getProperty("java.io.tmpdir");
@@ -412,8 +419,8 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
         //                "-shade", "240x40", watermarkFile.toAbsolutePath().toString()), step.getProcessId());
         ShellScript.callShell(
                 Arrays.asList(convertPath, "-size", watermarkDescription.getBoxSize(), "-background", "none", "-font", watermarkDescription.getFont(),
-                        "-fill", "white", "-gravity", "center", "caption:" + watermarkDescription.getText(),
-                        "-shade", watermarkDescription.getShadeSize(), watermarkFile.toAbsolutePath().toString()),
+                        "-fill", "white", "-gravity", "center", "label:" + watermarkDescription.getText(),
+                        watermarkFile.toAbsolutePath().toString()),
                 step.getProcessId());
         return watermarkFile;
     }
@@ -462,9 +469,9 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
         }
         List<HierarchicalConfiguration> filteredImageConfigs = new ArrayList<>();
         for (HierarchicalConfiguration imageConfig : allImageConfigs) {
-            if (imageConfig.getString("@collection", "").equals("*") || imageConfig.getString("@collection", "").equals(wantedCollectionName)) {
+            if ("*".equals(imageConfig.getString("@collection", "")) || imageConfig.getString("@collection", "").equals(wantedCollectionName)) {
                 String confMediaType = imageConfig.getString("@mediaType", "");
-                if (confMediaType.equals("*") || confMediaType.equals(wantedMediaType)) {
+                if ("*".equals(confMediaType) || confMediaType.equals(wantedMediaType)) {
                     filteredImageConfigs.add(imageConfig);
                 }
             }
@@ -482,7 +489,8 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
         String font = watermarkConfig.getString("font", "Open-Sans");
         String boxSize = watermarkConfig.getString("boxSize", "450x200");
         String shadeSize = watermarkConfig.getString("shadeSize", "240x40");
-        return new WatermarkDescription(imagePath != null, imagePath, text, location, xDistance, yDistance, font, boxSize, shadeSize);
+        double heightPercent = watermarkConfig.getDouble("heightPercent", 0);
+        return new WatermarkDescription(imagePath != null, imagePath, text, location, xDistance, yDistance, font, boxSize, shadeSize, heightPercent);
     }
 
     @Override

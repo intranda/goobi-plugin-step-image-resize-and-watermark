@@ -5,6 +5,6 @@
 		<exec executable="mvn">
 			<arg value="package" />
 		</exec>
-		<copy file="target/plugin_intranda_step_image_resize_and_watermark.jar" todir="/opt/digiverso/goobi/plugins/step/"/>
+		<copy file="module-base/target/plugin-step-image-resize-and-watermark-base.jar" todir="/opt/digiverso/goobi/plugins/step/"/>
 	</target>
 </project>

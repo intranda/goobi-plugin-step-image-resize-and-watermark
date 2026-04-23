@@ -84,8 +84,6 @@ Eine Beispielkonfiguration für die Datei `plugin_intranda_step_image_resize_and
             <watermark>
                 <!-- the image to use for watermarking -->
                 <image>/opt/digiverso/goobi/xslt/logo.png</image>
-                <!-- define the shade size here -->
-                <shadeSize>240x40</shadeSize>
                 <!-- the location of the watermark. Possible values: north,
                      northeast, east, southeast, south, southwest,
                      west, northwest -->
@@ -103,8 +101,6 @@ Eine Beispielkonfiguration für die Datei `plugin_intranda_step_image_resize_and
             <watermark>
                 <!-- you can also use a text-only watermark. -->
                 <text>My watermark text</text>
-                <!-- define the shade size here -->
-                <shadeSize>240x40</shadeSize>
                 <!-- define the size of the box for the text -->
                 <boxSize>450x200</boxSize>
                 <!-- font to use for the text rendering -->
@@ -112,6 +108,8 @@ Eine Beispielkonfiguration für die Datei `plugin_intranda_step_image_resize_and
                 <location>southeast</location>
                 <xDistance>600</xDistance>
                 <yDistance>100</yDistance>
+                <!-- Watermark size. If 0 is specified here, the original size of the watermark is used; otherwise, it is scaled to the size of the image  -->
+                <heightPercent>10</heightPercent>
             </watermark>
         </imageConfig>
 
@@ -133,7 +131,7 @@ Der Block `<config>` kann für verschiedene Projekte oder Arbeitsschritte wieder
 | `collection` | Einschränkung auf die Vorgänge, die einer ausgewählten digitalen Sammlung zugehören. |
 | `resizeTo` | Maximale Größe des Bildes an der längsten Seite. Angabe in Pixeln. |
 | `watermark/image` | Pfad zu einem Bild, das innerhalb des Wasserzeichens verwendet werden soll. |
-| `watermark/shadeSize` | Definieren Sie hier, welche Größenangabe als shade verwendet werden soll. |
+| `watermark/heightPercent` | Größenangabe des Wasserzeichens. Wenn hier 0 angegeben ist, wird die originale Größe des Wasserzeichens genutzt, ansonsten wird es auf die Größe des Bildes skaliert |
 | `watermark/text` | Text, der innerhalb des Wasserzeichens verwendet werden soll. |
 | `watermark/font` | Legen Sie hier fest, welche Schriftart für den Text verwendet werden soll. Diese Schriftart muss auf dem System installiert sein. |
 | `watermark/boxSize` | Definieren Sie hier, welche Maße die Box haben soll, innerhalb der der Text gerendered werden soll. Dies bestimmt somit die Größe der dargestellten Schrift. |

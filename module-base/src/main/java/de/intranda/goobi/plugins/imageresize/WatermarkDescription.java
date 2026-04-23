@@ -17,4 +17,5 @@ public class WatermarkDescription {
     private String font;
     private String boxSize;
     private String shadeSize;
+    private double heightPercent; // 0 = fixed size behavior; >0 = scale to this % of canvas height
 }

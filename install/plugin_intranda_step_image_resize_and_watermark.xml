@@ -29,8 +29,6 @@
             <watermark>
                 <!-- the image to use for watermarking -->
                 <image>/opt/digiverso/goobi/xslt/logo.png</image>
-                <!-- define the shade size here -->
-                <shadeSize>240x40</shadeSize>
                 <!-- the location of the watermark. Possible values: north,
                      northeast, east, southeast, south, southwest,
                      west, northwest -->
@@ -38,6 +36,8 @@
                 <!-- these are the distances to the edges on the x- resp. y-axis -->
                 <xDistance>100</xDistance>
                 <yDistance>100</yDistance>
+                <!-- Watermark size. If 0 is specified here, the original size of the watermark is used; otherwise, it is scaled to the size of the image  -->
+                <heightPercent>10</heightPercent>
             </watermark>
         </imageConfig>
 
@@ -48,15 +48,15 @@
             <watermark>
                 <!-- you can also use a text-only watermark. -->
                 <text>My watermark text</text>
-                <!-- define the shade size here -->
-                <shadeSize>240x40</shadeSize>
                 <!-- define the size of the box for the text -->
-                <boxSize>450x200</boxSize>
+                <boxSize>3000x500</boxSize>
                 <!-- font to use for the text rendering -->
                 <font>Open-Sans</font>
                 <location>southeast</location>
                 <xDistance>600</xDistance>
                 <yDistance>100</yDistance>
+                <!-- Watermark size. If 0 is specified here, the original size of the watermark is used; otherwise, it is scaled to the size of the image  -->
+                <heightPercent>10</heightPercent>
             </watermark>
         </imageConfig>
 
