@@ -52,6 +52,8 @@
                 <boxSize>3000x500</boxSize>
                 <!-- font to use for the text rendering -->
                 <font>Open-Sans</font>
+                <!-- optional font color. If nothing specified, 'white' is used -->
+                <fontColor>#746C61</fontColor>
                 <location>southeast</location>
                 <xDistance>600</xDistance>
                 <yDistance>100</yDistance>

@@ -419,7 +419,7 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
         //                "-shade", "240x40", watermarkFile.toAbsolutePath().toString()), step.getProcessId());
         ShellScript.callShell(
                 Arrays.asList(convertPath, "-size", watermarkDescription.getBoxSize(), "-background", "none", "-font", watermarkDescription.getFont(),
-                        "-fill", "white", "-gravity", "center", "label:" + watermarkDescription.getText(),
+                        "-fill", watermarkDescription.getFontColor(), "-gravity", "center", "label:" + watermarkDescription.getText(),
                         watermarkFile.toAbsolutePath().toString()),
                 step.getProcessId());
         return watermarkFile;
@@ -487,10 +487,12 @@ public class ImageResizeAndWatermarkPlugin implements IStepPluginVersion2 {
         int xDistance = watermarkConfig.getInt("xDistance", 100);
         int yDistance = watermarkConfig.getInt("yDistance", 100);
         String font = watermarkConfig.getString("font", "Open-Sans");
+        String fontColor = watermarkConfig.getString("fontColor", "white");
         String boxSize = watermarkConfig.getString("boxSize", "450x200");
         String shadeSize = watermarkConfig.getString("shadeSize", "240x40");
         double heightPercent = watermarkConfig.getDouble("heightPercent", 0);
-        return new WatermarkDescription(imagePath != null, imagePath, text, location, xDistance, yDistance, font, boxSize, shadeSize, heightPercent);
+        return new WatermarkDescription(imagePath != null, imagePath, text, location, xDistance, yDistance, font, fontColor, boxSize, shadeSize,
+                heightPercent);
     }
 
     @Override
